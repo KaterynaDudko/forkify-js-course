@@ -8,9 +8,19 @@ const timeout = function (s) {
   });
 };
 
-export const getJSON = async function (url) {
+export const AJAX = async function (url, body = undefined) {
   try {
-    const res = await Promise.race([fetch(url), timeout(TIMEOUT_SECONDS)]);
+    const request = body
+      ? fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        })
+      : fetch(url);
+
+    const res = await Promise.race([request, timeout(TIMEOUT_SECONDS)]);
     const data = await res.json();
 
     if (!res.ok) throw new Error(`${data.message} (${res.status})`);
